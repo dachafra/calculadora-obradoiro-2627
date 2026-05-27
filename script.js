@@ -189,7 +189,7 @@ function syncRenewalObradouro() {
   const wasAutoAmount = obradouroInput.dataset.autoValue === "true";
 
   obradouroTypeSelect.value = type;
-  if (wasAutoAmount || currentAmount === 0 || currentAmount === 80 || currentAmount === 200 || currentAmount < requiredAmount) {
+  if (currentAmount === 0 || currentAmount < requiredAmount || (wasAutoAmount && currentAmount === requiredAmount)) {
     obradouroInput.value = requiredAmount;
     obradouroInput.dataset.autoValue = "true";
   }
@@ -283,6 +283,11 @@ senioritySelect.addEventListener("change", () => {
 
 obradouroInput.addEventListener("input", () => {
   obradouroInput.dataset.autoValue = "false";
+});
+
+obradouroInput.addEventListener("change", () => {
+  syncRenewalObradouro();
+  updateCalculation();
 });
 
 form.addEventListener("input", updateCalculation);
