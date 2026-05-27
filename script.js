@@ -76,7 +76,6 @@ const form = document.querySelector("#calculator");
 const zoneSelect = document.querySelector("#zone");
 const tariffSelect = document.querySelector("#tariff");
 const senioritySelect = document.querySelector("#seniority");
-const obradouroTypeSelect = document.querySelector("#obradouroType");
 const obradouroInput = document.querySelector("#obradouro");
 const tableBody = document.querySelector("#priceTable tbody");
 const infoButtons = document.querySelectorAll("[data-info-trigger]");
@@ -154,7 +153,7 @@ function familyDiscount() {
 }
 
 function obradouroRules() {
-  const type = obradouroTypeSelect.value;
+  const type = obradouroTypeForTariff(tariffSelect.value);
   return type === "minor"
     ? { unit: 80, label: "menor de edad" }
     : { unit: 200, label: "adulto" };
@@ -162,7 +161,8 @@ function obradouroRules() {
 
 function validObradouroAmount(amount) {
   const rules = obradouroRules();
-  const validAmount = amount >= rules.unit ? Math.floor(amount / rules.unit) * rules.unit : 0;
+  const minimum = isRenewalDiscountSelected() ? rules.unit : 0;
+  const validAmount = amount >= minimum ? Math.floor(amount / rules.unit) * rules.unit : minimum;
   return { ...rules, validAmount };
 }
 
@@ -175,24 +175,45 @@ function obradouroTypeForTariff(tariffId) {
 }
 
 function syncRenewalObradouro() {
-  if (!isRenewalDiscountSelected()) {
-    if (obradouroInput.dataset.autoValue === "true") {
-      obradouroInput.value = 0;
-      obradouroInput.dataset.autoValue = "false";
-    }
-    return;
-  }
-
   const type = obradouroTypeForTariff(tariffSelect.value);
   const requiredAmount = type === "minor" ? 80 : 200;
   const currentAmount = numberValue("obradouro");
   const wasAutoAmount = obradouroInput.dataset.autoValue === "true";
 
-  obradouroTypeSelect.value = type;
-  if (currentAmount === 0 || currentAmount < requiredAmount || (wasAutoAmount && currentAmount === requiredAmount)) {
+  obradouroInput.step = String(requiredAmount);
+  obradouroInput.min = isRenewalDiscountSelected() ? String(requiredAmount) : "0";
+
+  if (!isRenewalDiscountSelected()) {
+    if (obradouroInput.dataset.autoValue === "true") {
+      obradouroInput.value = 0;
+      obradouroInput.dataset.autoValue = "false";
+    }
+    normalizeObradouroToStep();
+    return;
+  }
+
+  if (wasAutoAmount || currentAmount === 0 || currentAmount < requiredAmount) {
     obradouroInput.value = requiredAmount;
     obradouroInput.dataset.autoValue = "true";
+    return;
   }
+
+  normalizeObradouroToStep();
+}
+
+function normalizeObradouroToStep() {
+  const rules = obradouroRules();
+  const amount = numberValue("obradouro");
+  const minimum = isRenewalDiscountSelected() ? rules.unit : 0;
+
+  if (amount < minimum) {
+    obradouroInput.value = minimum;
+    obradouroInput.dataset.autoValue = String(minimum > 0);
+    return;
+  }
+
+  const normalized = Math.floor(amount / rules.unit) * rules.unit;
+  obradouroInput.value = normalized;
 }
 
 function updateCalculation() {
@@ -255,7 +276,7 @@ function updateCalculation() {
   document.querySelector("#calculationNote").textContent = notes.join(" ");
 
   const obradouroHelp = document.querySelector("#obradouroHelp");
-  obradouroHelp.textContent = `Préstamo a devolver en 2032. Mínimo ${formatEuro(obradouroResult.unit)} y múltiplos exactos de ${formatEuro(obradouroResult.unit)}. Se descuenta el 50% del importe válido.`;
+  obradouroHelp.textContent = `Préstamo a devolver en 2032. ${obradouroResult.label === "menor de edad" ? "Menores" : "General y mayores de 65"}: mínimo ${formatEuro(obradouroResult.unit)} y múltiplos exactos de ${formatEuro(obradouroResult.unit)}. Usa las flechas para cambiar el importe.`;
   obradouroHelp.classList.toggle("warning", obradouro > 0 && obradouro !== obradouroResult.validAmount);
 }
 
@@ -289,6 +310,16 @@ obradouroInput.addEventListener("change", () => {
   syncRenewalObradouro();
   updateCalculation();
 });
+
+obradouroInput.addEventListener("keydown", (event) => {
+  if (!["Tab", "Shift", "ArrowUp", "ArrowDown"].includes(event.key)) {
+    event.preventDefault();
+  }
+});
+
+obradouroInput.addEventListener("paste", (event) => event.preventDefault());
+obradouroInput.addEventListener("drop", (event) => event.preventDefault());
+obradouroInput.addEventListener("wheel", (event) => event.preventDefault(), { passive: false });
 
 form.addEventListener("input", updateCalculation);
 form.addEventListener("change", updateCalculation);

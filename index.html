@@ -91,17 +91,10 @@
           <fieldset>
             <legend>Aportaciones directas</legend>
             <div class="field-grid">
-              <label for="obradouroType">
-                Tipo Obrad'ouro
-                <select id="obradouroType" name="obradouroType">
-                  <option value="adult">Adulto</option>
-                  <option value="minor">Menor de edad</option>
-                </select>
-                <span class="help-text" id="obradouroHelp">Mínimo 200 € y múltiplos exactos de 200 €.</span>
-              </label>
               <label for="obradouro">
                 Aportación Obrad'ouro
-                <input id="obradouro" name="obradouro" type="number" min="0" step="1" value="0" inputmode="numeric">
+                <input id="obradouro" name="obradouro" type="number" min="0" step="200" value="0" inputmode="none" autocomplete="off">
+                <span class="help-text" id="obradouroHelp">General y mayores de 65: mínimo 200 € y múltiplos de 200 €.</span>
               </label>
               <label for="donation">
                 Donación Fundación
