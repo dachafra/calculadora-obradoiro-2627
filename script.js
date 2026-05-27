@@ -182,14 +182,18 @@ function updateCalculation() {
   const percentDiscount = base * (Math.min(percent, 100) / 100);
   const obradouroDiscount = obradouroResult.validAmount * 0.5;
   const donationDiscount = Math.floor(donation / 150) * 100;
-  const total = Math.max(0, Math.floor(base - percentDiscount - obradouroDiscount - donationDiscount));
+  const subscriptionTotal = Math.max(0, Math.floor(base - percentDiscount - obradouroDiscount - donationDiscount));
+  const contributionTotal = obradouroResult.validAmount + donation;
+  const total = subscriptionTotal + contributionTotal;
 
   document.querySelector("#totalPrice").textContent = formatEuro(total);
-  document.querySelector("#selectedSummary").textContent = `${zone.name} · ${tariff.name} · ${percent}% en descuentos`;
+  document.querySelector("#selectedSummary").textContent = `${zone.name} · ${tariff.name} · incluye aportaciones`;
   document.querySelector("#basePrice").textContent = formatEuro(base);
   document.querySelector("#percentDiscount").textContent = `-${formatEuro(percentDiscount)} (${percent}%)`;
   document.querySelector("#obradouroDiscount").textContent = `-${formatEuro(obradouroDiscount)}`;
   document.querySelector("#donationDiscount").textContent = `-${formatEuro(donationDiscount)}`;
+  document.querySelector("#subscriptionTotal").textContent = formatEuro(subscriptionTotal);
+  document.querySelector("#contributionTotal").textContent = formatEuro(contributionTotal);
   document.querySelector("#totalBreakdown").textContent = formatEuro(total);
 
   const notes = [];
@@ -208,6 +212,9 @@ function updateCalculation() {
   }
   if (donation > 0) {
     notes.push("La donación descuenta 100 € por cada tramo completo de 150 €.");
+  }
+  if (contributionTotal > 0) {
+    notes.push("El total a pagar suma el abono final y las aportaciones introducidas.");
   }
   notes.push("El resultado elimina decimales, como indica la campaña.");
   document.querySelector("#calculationNote").textContent = notes.join(" ");
