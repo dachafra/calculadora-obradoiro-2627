@@ -75,6 +75,9 @@ const euro = new Intl.NumberFormat("es-ES", {
 const form = document.querySelector("#calculator");
 const zoneSelect = document.querySelector("#zone");
 const tariffSelect = document.querySelector("#tariff");
+const senioritySelect = document.querySelector("#seniority");
+const obradouroTypeSelect = document.querySelector("#obradouroType");
+const obradouroInput = document.querySelector("#obradouro");
 const tableBody = document.querySelector("#priceTable tbody");
 const infoButtons = document.querySelectorAll("[data-info-trigger]");
 
@@ -136,7 +139,7 @@ function numberValue(id) {
 }
 
 function seniorityDiscount(tariffId) {
-  const value = document.querySelector("#seniority").value;
+  const value = senioritySelect.value;
   if (tariffId === "reduced" && (value === "current" || value === "old")) return 0;
 
   if (value === "current") return 15;
@@ -151,7 +154,7 @@ function familyDiscount() {
 }
 
 function obradouroRules() {
-  const type = document.querySelector("#obradouroType").value;
+  const type = obradouroTypeSelect.value;
   return type === "minor"
     ? { unit: 80, label: "menor de edad" }
     : { unit: 200, label: "adulto" };
@@ -161,6 +164,35 @@ function validObradouroAmount(amount) {
   const rules = obradouroRules();
   const validAmount = amount >= rules.unit ? Math.floor(amount / rules.unit) * rules.unit : 0;
   return { ...rules, validAmount };
+}
+
+function isRenewalDiscountSelected() {
+  return senioritySelect.value === "current" || senioritySelect.value === "old";
+}
+
+function obradouroTypeForTariff(tariffId) {
+  return ["baby", "child", "youth"].includes(tariffId) ? "minor" : "adult";
+}
+
+function syncRenewalObradouro() {
+  if (!isRenewalDiscountSelected()) {
+    if (obradouroInput.dataset.autoValue === "true") {
+      obradouroInput.value = 0;
+      obradouroInput.dataset.autoValue = "false";
+    }
+    return;
+  }
+
+  const type = obradouroTypeForTariff(tariffSelect.value);
+  const requiredAmount = type === "minor" ? 80 : 200;
+  const currentAmount = numberValue("obradouro");
+  const wasAutoAmount = obradouroInput.dataset.autoValue === "true";
+
+  obradouroTypeSelect.value = type;
+  if (wasAutoAmount || currentAmount === 0 || currentAmount === 80 || currentAmount === 200 || currentAmount < requiredAmount) {
+    obradouroInput.value = requiredAmount;
+    obradouroInput.dataset.autoValue = "true";
+  }
 }
 
 function updateCalculation() {
@@ -187,7 +219,7 @@ function updateCalculation() {
   const total = subscriptionTotal + contributionTotal;
 
   document.querySelector("#totalPrice").textContent = formatEuro(total);
-  document.querySelector("#selectedSummary").textContent = `${zone.name} · ${tariff.name} · incluye aportaciones`;
+  document.querySelector("#selectedSummary").textContent = `${zone.name} · ${tariff.name} · total con aportaciones`;
   document.querySelector("#basePrice").textContent = formatEuro(base);
   document.querySelector("#percentDiscount").textContent = `-${formatEuro(percentDiscount)} (${percent}%)`;
   document.querySelector("#obradouroDiscount").textContent = `-${formatEuro(obradouroDiscount)}`;
@@ -197,17 +229,20 @@ function updateCalculation() {
   document.querySelector("#totalBreakdown").textContent = formatEuro(total);
 
   const notes = [];
-  const seniority = document.querySelector("#seniority").value;
+  const seniority = senioritySelect.value;
   if (tariffId === "reduced" && (seniority === "current" || seniority === "old")) {
     notes.push("La tarifa reducida no aplica descuento por renovación o antiguo abonado.");
   }
+  if (isRenewalDiscountSelected()) {
+    notes.push(`La renovación con descuento incluye automáticamente la aportación mínima Obrad'ouro de ${formatEuro(obradouroResult.unit)}.`);
+  }
   if (obradouro > 0) {
     if (obradouroResult.validAmount === obradouro) {
-      notes.push(`Obrad'ouro descuenta el 50% de la aportación válida para ${obradouroResult.label}.`);
+      notes.push(`Obrad'ouro es un préstamo que se devolverá en 2032 y descuenta ahora el 50% de la aportación válida para ${obradouroResult.label}.`);
     } else if (obradouroResult.validAmount > 0) {
-      notes.push(`Obrad'ouro solo cuenta ${formatEuro(obradouroResult.validAmount)}: mínimo ${formatEuro(obradouroResult.unit)} y múltiplos de ${formatEuro(obradouroResult.unit)} para ${obradouroResult.label}.`);
+      notes.push(`Obrad'ouro es un préstamo que se devolverá en 2032. Para el descuento solo cuenta ${formatEuro(obradouroResult.validAmount)}: mínimo ${formatEuro(obradouroResult.unit)} y múltiplos de ${formatEuro(obradouroResult.unit)} para ${obradouroResult.label}.`);
     } else {
-      notes.push(`Obrad'ouro no se aplica: mínimo ${formatEuro(obradouroResult.unit)} para ${obradouroResult.label}.`);
+      notes.push(`Obrad'ouro es un préstamo que se devolverá en 2032. No se aplica al descuento porque el mínimo es ${formatEuro(obradouroResult.unit)} para ${obradouroResult.label}.`);
     }
   }
   if (donation > 0) {
@@ -220,18 +255,34 @@ function updateCalculation() {
   document.querySelector("#calculationNote").textContent = notes.join(" ");
 
   const obradouroHelp = document.querySelector("#obradouroHelp");
-  obradouroHelp.textContent = `Mínimo ${formatEuro(obradouroResult.unit)} y múltiplos exactos de ${formatEuro(obradouroResult.unit)}. Se descuenta el 50% del importe válido.`;
+  obradouroHelp.textContent = `Préstamo a devolver en 2032. Mínimo ${formatEuro(obradouroResult.unit)} y múltiplos exactos de ${formatEuro(obradouroResult.unit)}. Se descuenta el 50% del importe válido.`;
   obradouroHelp.classList.toggle("warning", obradouro > 0 && obradouro !== obradouroResult.validAmount);
 }
 
 fillZones();
 fillTariffs();
+syncRenewalObradouro();
 fillTable();
 updateCalculation();
 
 zoneSelect.addEventListener("change", () => {
   fillTariffs();
+  syncRenewalObradouro();
   updateCalculation();
+});
+
+tariffSelect.addEventListener("change", () => {
+  syncRenewalObradouro();
+  updateCalculation();
+});
+
+senioritySelect.addEventListener("change", () => {
+  syncRenewalObradouro();
+  updateCalculation();
+});
+
+obradouroInput.addEventListener("input", () => {
+  obradouroInput.dataset.autoValue = "false";
 });
 
 form.addEventListener("input", updateCalculation);
