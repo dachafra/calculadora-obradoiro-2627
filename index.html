@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Calculadora de abonos Obradoiro 2026-2027</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-copy">
+        <p class="eyebrow">Temporada 2026-2027</p>
+        <h1>Calculadora de abonos Obradoiro</h1>
+        <p class="subtitle">Precios, descuentos y aportaciones aplicados según la campaña de abonos 26/27.</p>
+      </div>
+      <div class="hero-side">
+        <img class="site-logo" src="PECHO3.png" alt="PECHO3">
+        <div class="price-highlight" aria-live="polite">
+          <span class="price-label">Precio estimado</span>
+          <strong id="totalPrice">0 €</strong>
+          <span id="selectedSummary">Selecciona zona y tarifa</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="calculator-band" aria-label="Calculadora">
+        <form class="calculator" id="calculator">
+          <fieldset>
+            <legend>Abono</legend>
+            <div class="field-grid">
+              <label for="zone">
+                Zona
+                <select id="zone" name="zone"></select>
+              </label>
+              <label for="tariff">
+                Tarifa
+                <select id="tariff" name="tariff"></select>
+              </label>
+              <label for="seniority">
+                Antigüedad
+                <select id="seniority" name="seniority">
+                  <option value="current">Abonado 25-26, 15%</option>
+                  <option value="old">Abonado entre 2011-12 y 24-25, 5%</option>
+                  <option value="friend">Recomendado por un abonado, 5%</option>
+                  <option value="new">Nuevo abonado, 0%</option>
+                </select>
+              </label>
+              <label for="familyMember">
+                Miembro familiar
+                <select id="familyMember" name="familyMember">
+                  <option value="1">1º miembro, 0%</option>
+                  <option value="2">2º miembro, 10%</option>
+                  <option value="3">3º miembro, 15%</option>
+                  <option value="4">4º miembro, 20%</option>
+                  <option value="5">5º miembro, 25%</option>
+                  <option value="6">6º miembro, 30%</option>
+                  <option value="7">7º miembro, 35%</option>
+                  <option value="8">8º miembro, 40%</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Descuentos acumulables</legend>
+            <div class="toggle-grid">
+              <div class="toggle discount-option">
+                <label class="toggle-control" for="loyalty">
+                  <input type="checkbox" id="loyalty" name="loyalty">
+                  <span>5% Fidelidade</span>
+                </label>
+                <button class="info-dot" type="button" aria-label="Ver información de Fidelidade" aria-expanded="false" aria-controls="loyaltyInfo" data-info-trigger="loyaltyInfo">i</button>
+                <span class="info-popover" id="loyaltyInfo" role="status">5% Fidelidade: Por ter sido abonado durante 5 tempadas.</span>
+              </div>
+              <div class="toggle discount-option">
+                <label class="toggle-control" for="attendance">
+                  <input type="checkbox" id="attendance" name="attendance">
+                  <span>5% Asistencia</span>
+                </label>
+                <button class="info-dot" type="button" aria-label="Ver información de Asistencia" aria-expanded="false" aria-controls="attendanceInfo" data-info-trigger="attendanceInfo">i</button>
+                <span class="info-popover" id="attendanceInfo" role="status">5% Asistencia: Recompensa por ter asistido aos 16 partidos da tempada 2025-2026.</span>
+              </div>
+              <label class="number-field" for="friendsBrought">
+                Amigos traídos
+                <input id="friendsBrought" name="friendsBrought" type="number" min="0" step="1" value="0">
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Aportaciones directas</legend>
+            <div class="field-grid">
+              <label for="obradouroType">
+                Tipo Obrad'ouro
+                <select id="obradouroType" name="obradouroType">
+                  <option value="adult">Adulto</option>
+                  <option value="minor">Menor de edad</option>
+                </select>
+                <span class="help-text" id="obradouroHelp">Mínimo 200 € y múltiplos exactos de 200 €.</span>
+              </label>
+              <label for="obradouro">
+                Aportación Obrad'ouro
+                <input id="obradouro" name="obradouro" type="number" min="0" step="1" value="0" inputmode="numeric">
+              </label>
+              <label for="donation">
+                Donación Fundación
+                <input id="donation" name="donation" type="number" min="0" step="1" value="0" inputmode="numeric">
+              </label>
+            </div>
+          </fieldset>
+        </form>
+
+        <aside class="result-panel">
+          <h2>Resultado</h2>
+          <dl class="breakdown">
+            <div>
+              <dt>Precio base</dt>
+              <dd id="basePrice">0 €</dd>
+            </div>
+            <div>
+              <dt>Descuento porcentual</dt>
+              <dd id="percentDiscount">0 €</dd>
+            </div>
+            <div>
+              <dt>Obrad'ouro</dt>
+              <dd id="obradouroDiscount">0 €</dd>
+            </div>
+            <div>
+              <dt>Donación Fundación</dt>
+              <dd id="donationDiscount">0 €</dd>
+            </div>
+            <div class="total-row">
+              <dt>Total</dt>
+              <dd id="totalBreakdown">0 €</dd>
+            </div>
+          </dl>
+          <p class="calculation-note" id="calculationNote"></p>
+        </aside>
+      </section>
+
+      <section class="table-band" aria-labelledby="tableTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Tabla oficial</p>
+          <h2 id="tableTitle">Precios base por zona y tarifa</h2>
+        </div>
+        <div class="table-wrap">
+          <table id="priceTable">
+            <thead>
+              <tr>
+                <th>Zona</th>
+                <th>Sector</th>
+                <th>General</th>
+                <th>&gt;65</th>
+                <th>Xuvenil</th>
+                <th>Infantil</th>
+                <th>Baby</th>
+                <th>Reducida</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
