@@ -149,7 +149,7 @@ function seniorityDiscount(tariffId) {
 
 function familyDiscount() {
   const member = numberValue("familyMember");
-  return member >= 2 ? member * 5 : 0;
+  return member >= 2 ? (member - 1) * 10 : 0;
 }
 
 function obradouroRules() {
