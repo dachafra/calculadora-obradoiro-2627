@@ -245,7 +245,8 @@ function updateCalculation() {
   document.querySelector("#totalPrice").textContent = formatEuro(total);
   document.querySelector("#selectedSummary").textContent = `${zone.name} · ${tariff.name} · total con aportaciones`;
   document.querySelector("#basePrice").textContent = formatEuro(base);
-  document.querySelector("#percentDiscount").textContent = `-${formatEuro(percentDiscount)} (${seniorityPercent}% + ${benefitsPercent}%)`;
+  document.querySelector("#seniorityDiscount").textContent = `-${formatEuro(seniorityDiscountAmount)} (${seniorityPercent}%)`;
+  document.querySelector("#benefitsDiscount").textContent = `-${formatEuro(benefitsDiscount)} (${benefitsPercent}%)`;
   document.querySelector("#obradouroDiscount").textContent = `-${formatEuro(obradouroDiscount)}`;
   document.querySelector("#donationDiscount").textContent = `-${formatEuro(donationDiscount)}`;
   document.querySelector("#subscriptionTotal").textContent = formatEuro(subscriptionTotal);
