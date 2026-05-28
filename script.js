@@ -226,13 +226,16 @@ function updateCalculation() {
   const obradouro = numberValue("obradouro");
   const obradouroResult = validObradouroAmount(obradouro);
 
-  let percent = seniorityDiscount(tariffId);
-  percent += familyDiscount();
-  percent += document.querySelector("#loyalty").checked ? 5 : 0;
-  percent += document.querySelector("#attendance").checked ? 5 : 0;
-  percent += friendsBrought * 5;
+  const seniorityPercent = seniorityDiscount(tariffId);
+  let benefitsPercent = familyDiscount();
+  benefitsPercent += document.querySelector("#loyalty").checked ? 5 : 0;
+  benefitsPercent += document.querySelector("#attendance").checked ? 5 : 0;
+  benefitsPercent += friendsBrought * 5;
 
-  const percentDiscount = base * (Math.min(percent, 100) / 100);
+  const seniorityDiscountAmount = base * (Math.min(seniorityPercent, 100) / 100);
+  const priceAfterSeniority = base - seniorityDiscountAmount;
+  const benefitsDiscount = priceAfterSeniority * (Math.min(benefitsPercent, 100) / 100);
+  const percentDiscount = seniorityDiscountAmount + benefitsDiscount;
   const obradouroDiscount = obradouroResult.validAmount;
   const donationDiscount = Math.floor(donation / 150) * 100;
   const subscriptionTotal = Math.max(0, Math.floor(base - percentDiscount - obradouroDiscount - donationDiscount));
@@ -242,7 +245,7 @@ function updateCalculation() {
   document.querySelector("#totalPrice").textContent = formatEuro(total);
   document.querySelector("#selectedSummary").textContent = `${zone.name} · ${tariff.name} · total con aportaciones`;
   document.querySelector("#basePrice").textContent = formatEuro(base);
-  document.querySelector("#percentDiscount").textContent = `-${formatEuro(percentDiscount)} (${percent}%)`;
+  document.querySelector("#percentDiscount").textContent = `-${formatEuro(percentDiscount)} (${seniorityPercent}% + ${benefitsPercent}%)`;
   document.querySelector("#obradouroDiscount").textContent = `-${formatEuro(obradouroDiscount)}`;
   document.querySelector("#donationDiscount").textContent = `-${formatEuro(donationDiscount)}`;
   document.querySelector("#subscriptionTotal").textContent = formatEuro(subscriptionTotal);
@@ -256,6 +259,9 @@ function updateCalculation() {
   }
   if (isRenewalDiscountSelected()) {
     notes.push(`La renovación con descuento incluye automáticamente la aportación mínima Obrad'ouro de ${formatEuro(obradouroResult.unit)}.`);
+  }
+  if (benefitsPercent > 0) {
+    notes.push("Los beneficios acumulables se calculan sobre el precio ya rebajado por antigüedad o renovación.");
   }
   if (obradouro > 0) {
     if (obradouroResult.validAmount === obradouro) {
