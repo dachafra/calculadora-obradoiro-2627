@@ -233,7 +233,7 @@ function updateCalculation() {
   percent += friendsBrought * 5;
 
   const percentDiscount = base * (Math.min(percent, 100) / 100);
-  const obradouroDiscount = obradouroResult.validAmount * 0.5;
+  const obradouroDiscount = obradouroResult.validAmount;
   const donationDiscount = Math.floor(donation / 150) * 100;
   const subscriptionTotal = Math.max(0, Math.floor(base - percentDiscount - obradouroDiscount - donationDiscount));
   const contributionTotal = obradouroResult.validAmount + donation;
@@ -259,7 +259,7 @@ function updateCalculation() {
   }
   if (obradouro > 0) {
     if (obradouroResult.validAmount === obradouro) {
-      notes.push(`Obrad'ouro es un préstamo que se devolverá en 2032 y descuenta ahora el 50% de la aportación válida para ${obradouroResult.label}.`);
+      notes.push(`Obrad'ouro es un préstamo que se devolverá en 2032 y descuenta ahora el 100% de la aportación válida para ${obradouroResult.label}.`);
     } else if (obradouroResult.validAmount > 0) {
       notes.push(`Obrad'ouro es un préstamo que se devolverá en 2032. Para el descuento solo cuenta ${formatEuro(obradouroResult.validAmount)}: mínimo ${formatEuro(obradouroResult.unit)} y múltiplos de ${formatEuro(obradouroResult.unit)} para ${obradouroResult.label}.`);
     } else {
@@ -276,7 +276,7 @@ function updateCalculation() {
   document.querySelector("#calculationNote").textContent = notes.join(" ");
 
   const obradouroHelp = document.querySelector("#obradouroHelp");
-  obradouroHelp.textContent = `Préstamo a devolver en 2032. ${obradouroResult.label === "menor de edad" ? "Menores" : "General y mayores de 65"}: mínimo ${formatEuro(obradouroResult.unit)} y múltiplos exactos de ${formatEuro(obradouroResult.unit)}. Usa las flechas para cambiar el importe.`;
+  obradouroHelp.textContent = `Préstamo a devolver en 2032. ${obradouroResult.label === "menor de edad" ? "Menores" : "General y mayores de 65"}: mínimo ${formatEuro(obradouroResult.unit)} y múltiplos exactos de ${formatEuro(obradouroResult.unit)}. Descuenta el 100% del importe válido.`;
   obradouroHelp.classList.toggle("warning", obradouro > 0 && obradouro !== obradouroResult.validAmount);
 }
 
