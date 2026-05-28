@@ -336,6 +336,18 @@ input:focus {
   line-height: 1.45;
 }
 
+.disclaimer-note {
+  margin: 14px 0 0;
+  padding: 12px;
+  border-left: 3px solid var(--red);
+  border-radius: 6px;
+  background: #fff4f5;
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
 .table-band {
   background: #f3f6fb;
 }

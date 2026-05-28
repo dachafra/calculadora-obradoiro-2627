@@ -267,7 +267,7 @@ function updateCalculation() {
     }
   }
   if (donation > 0) {
-    notes.push("La donación descuenta 100 € por cada tramo completo de 150 €.");
+    notes.push("La donación descuenta 100 € por cada tramo completo de 150 €, genera 50 € en entradas para la temporada 26-27 y puede tener deducción fiscal legal de entre el 40% y el 80%.");
   }
   if (contributionTotal > 0) {
     notes.push("El total a pagar suma el abono final y las aportaciones introducidas.");
